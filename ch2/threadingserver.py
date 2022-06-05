@@ -45,6 +45,7 @@ def main ():
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.daemon = True
     server_thread.start()
+    print('Server loop running on thread: %s' % server_thread.name)
 
     # launch client
     client(ip, port, 'Hello from client 1')
