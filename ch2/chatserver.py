@@ -16,7 +16,7 @@ SERVER_HOST = 'localhost'
 CHAT_SERVER_NAME = 'server'
 
 
-def send (channel, *args):
+def send(channel, *args):
     buffer = pickle.dumps(args)
     value = socket.htonl(len(buffer))
     size = struct.pack('L', value)
@@ -24,7 +24,7 @@ def send (channel, *args):
     channel.send(buffer)
 
 
-def receive (channel):
+def receive(channel):
     size = struct.calcsize('L')
     size = channel.recv(size)
     try:
@@ -38,7 +38,7 @@ def receive (channel):
 
 
 class ChatServer (object):
-    def __init__ (self, port, backlog=5):
+    def __init__(self, port, backlog=5):
         self.clientCount = 0
         self.clientMap = {}
         self.clients = []
@@ -50,32 +50,35 @@ class ChatServer (object):
         # catch keyboard interrupts
         signal.signal(signal.SIGINT, self.sighandler)
 
-    def sighandler (self, signum, frame):
+    def sighandler(self, signum, frame):
         print('Shutdown server...')
         for client in self.clients:
             client.close()
         self.server.close()
 
-    def get_client_name (self, client):
-        info =  self.clientMap[client]
+    def get_client_name(self, client):
+        info = self.clientMap[client]
         host, name = info[0][0], info[1]
         return '@'.join((name, host))
 
-    def run (self):
+    def run(self):
         inputs = [self.server, sys.stdin]
         self.clients = []
         running = True
         while running:
             try:
-                readable, writable, exceptional = select.select(inputs, self.clients, [])
+                readable, writable, exceptional = select.select(
+                    inputs, self.clients, [])
             except select.error:
                 break
             for sock in readable:
                 if sock == self.server:
                     # handle the server socket
                     client, address = self.server.accept()
-                    print('Chat server: got connection %d from %s' % (client.fileno(), address))
-                    
+                    print(
+                        'Chat server: got connection %d from %s' %
+                        (client.fileno(), address))
+
                     # read and login name
                     cname = receive(client).split('NAME: ')[1]
 
@@ -86,7 +89,8 @@ class ChatServer (object):
                     self.clientMap[client] = (address, cname)
 
                     # send joining info to other client
-                    msg = '\n(Connected: New client (%d) from %s' % (self.clientCount, self.get_client_name(client))
+                    msg = '\n(Connected: New client (%d) from %s' % (
+                        self.clientCount, self.get_client_name(client))
                     for other in self.clients:
                         send(other, msg)
                     self.clients.append(client)
@@ -101,7 +105,8 @@ class ChatServer (object):
                         data = receive(sock)
                         if data:
                             # send as new client's message
-                            msg = '\n#[' + self.get_client_name(sock) + ']>>' + data
+                            msg = '\n#[' + \
+                                self.get_client_name(sock) + ']>>' + data
                             # send data to all, except ourself
                             for output in self.clients:
                                 if output != sock:
@@ -114,7 +119,8 @@ class ChatServer (object):
                             self.clients.remove(sock)
 
                             # sending client leaving info to other
-                            msg = '\n(Now huang up: Client from %s)' % self.get_client_name(sock)
+                            msg = '\n(Now huang up: Client from %s)' % self.get_client_name(
+                                sock)
                             for client in self.clients:
                                 send(client, msg)
                     except socket.error:
@@ -124,12 +130,13 @@ class ChatServer (object):
 
 
 class ChatClient (object):
-    def __init__ (self, name, port, host=SERVER_HOST):
+    def __init__(self, name, port, host=SERVER_HOST):
         self.name = name
         self.connected = False
         self.host = host
         self.port = port
-        self.prompt = '[' + '@'.join((name, socket.gethostname().split('.')[0])) + ']>'
+        self.prompt = '[' + '@'.join((name,
+                                      socket.gethostname().split('.')[0])) + ']>'
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((host, self.port))
@@ -143,12 +150,13 @@ class ChatClient (object):
             print('Failed to connect to chat server @ port %d' % self.port)
             sys.exit(1)
 
-    def run (self):
+    def run(self):
         while self.connected:
             try:
                 sys.stdout.write(self.prompt)
                 sys.stdout.flush()
-                readable, writable, exceptional = select.select([0, self.sock], [], [])
+                readable, writable, exceptional = select.select(
+                    [0, self.sock], [], [])
                 for sock in readable:
                     if sock == 0:
                         data = sys.stdin.readline().strip()
@@ -170,9 +178,15 @@ class ChatClient (object):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Socket Server Example with Select')
+    parser = argparse.ArgumentParser(
+        description='Socket Server Example with Select')
     parser.add_argument('--name', action='store', dest='name', required=True)
-    parser.add_argument('--port', action='store', dest='port', type=int, required=True)
+    parser.add_argument(
+        '--port',
+        action='store',
+        dest='port',
+        type=int,
+        required=True)
     args = parser.parse_args()
     if args.name == CHAT_SERVER_NAME:
         server = ChatServer(args.port)
