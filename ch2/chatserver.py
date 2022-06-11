@@ -6,8 +6,6 @@ import select
 import socket
 import sys
 import signal
-# from _pickle import cPickle
-import pickle
 import struct
 import argparse
 
@@ -16,8 +14,27 @@ SERVER_HOST = 'localhost'
 CHAT_SERVER_NAME = 'server'
 
 
-def send(channel, *args):
-    buffer = pickle.dumps(args)
+def marshal(data: str, encoding: str = 'utf-8') -> bytes:
+    if encoding == 'pickle':
+        import pickle
+        return pickle.dumps(data)
+    else:  # utf-8
+        return bytes(data, encoding)
+
+
+def unmarshal(data: bytes, encoding: str = 'utf-8') -> str:
+    if encoding == 'pickle':
+        import pickle
+        return pickle.loads(data)[0]
+    else:  # utf-8
+        return data.decode()
+
+# workaournd, bytes() require parameter type is string instead of tuple
+# def send(channel, *args):
+
+
+def send(channel, args: str):
+    buffer = marshal(args)
     value = socket.htonl(len(buffer))
     size = struct.pack('L', value)
     channel.send(size)
@@ -34,10 +51,10 @@ def receive(channel):
     buf = channel.recv(size)
     while not buf or len(buf) < size:
         buf += channel.recv(size - len(buf))
-    return pickle.loads(buf)[0]
+    return unmarshal(buf)
 
 
-class ChatServer (object):
+class ChatServer(object):
     def __init__(self, port, backlog=5):
         self.clientCount = 0
         self.clientMap = {}
@@ -129,7 +146,7 @@ class ChatServer (object):
         self.server.close()
 
 
-class ChatClient (object):
+class ChatClient(object):
     def __init__(self, name, port, host=SERVER_HOST):
         self.name = name
         self.connected = False
