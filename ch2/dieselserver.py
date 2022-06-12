@@ -6,6 +6,11 @@ import argparse
 # import logging
 # logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
+'''
+diesel is old framework 8 years ago
+will try to recreate a example using other latest popular framework
+'''
+
 
 class EchoServer(object):
     '''
