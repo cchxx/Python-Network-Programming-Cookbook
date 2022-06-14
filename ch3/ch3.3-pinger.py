@@ -84,7 +84,7 @@ class Pinger(object):
         answer = (answer >> 8) + ((answer << 8) & 0xff00)
         return answer
 
-    def receive_pong(self, sock, pkt_id, timeout: int):
+    def receive_pong(self, sock, indentifier, timeout: int):
         '''receive ping from the socket'''
         time_remaining = timeout
         while True:
@@ -98,7 +98,7 @@ class Pinger(object):
             pkt, addr = sock.recvfrom(1024)
             icmp_hdr = pkt[20:28]
             type, code, checksum, id, seq = struct.unpack('bbHHh', icmp_hdr)
-            if id == pkt_id:
+            if id == indentifier:
                 bytes_in_double = struct.calcsize('d')
                 time_spent = struct.unpack(
                     'd', pkt[28:28 + bytes_in_double])[0]
@@ -135,9 +135,9 @@ class Pinger(object):
                 # operation not permitted
                 errmsg += 'ICMP message can only be sent from root user process'
                 raise socket.error(errmsg)
-        my_id = os.getpid() & 0xffff
-        self.send_ping(sock, my_id)
-        delay = self.receive_pong(sock, my_id, self.timeout)
+        pid = os.getpid() & 0xffff
+        self.send_ping(sock, pid)
+        delay = self.receive_pong(sock, pid, self.timeout)
         sock.close()
         return delay
 
@@ -159,11 +159,7 @@ class Pinger(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='python ping')
-    parser.add_argument(
-        '--target-host',
-        action='store',
-        dest='target_host',
-        required=True)
+    parser.add_argument( '--target-host', action='store', dest='target_host', required=True)
     args = parser.parse_args()
     pinger = Pinger(args.target_host)
     pinger.ping()
