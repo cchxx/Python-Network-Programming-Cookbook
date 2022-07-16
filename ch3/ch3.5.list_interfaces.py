@@ -7,9 +7,7 @@ import socket
 import fcntl
 import struct
 import array
-
 import ctypes
-
 
 drvlib = ctypes.CDLL('/usr/local/lib/libioc.so')
 
@@ -117,8 +115,6 @@ def list_interfaces():
     ... omitted ...
     '''
     namestr = interface_names.tostring()
-    # import pdb; pdb.set_trace()
-    # for i in range(0, outbytes, struct_size):
     for i in range(0, outbytes, STRUCT_SIZE_IFREQ):
         interfaces.append((namestr[i:i + IFNAMSIZ].split(b'\x00', 1)[0]))
     return interfaces
