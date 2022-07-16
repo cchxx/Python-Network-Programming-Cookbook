@@ -1,15 +1,14 @@
-// #include <stdio.h>
 #include <linux/if.h>
 #include "ioc.h"
 
 static struct ioc_map struct_map[] = {
-    { "ifreq",              sizeof(struct ifreq) },
-    { NULL,                     0                }
+    { "ifreq",  sizeof(struct ifreq) },
+    { NULL,     0                    }
 };
 
 static struct ioc_map macro_map[] = {
-    { "IFNAMSIZ",              IFNAMSIZ	},
-    { NULL,                     0       }
+    { "IFNAMSIZ", IFNAMSIZ },
+    { NULL,       0        }
 };
 
 int
