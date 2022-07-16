@@ -1,17 +1,19 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(ioc_query)
+project(drvlib)
 
 ############################################################
 # Create a library
 ############################################################
 
-add_library(iocq
+add_library(ioc
     SHARED 
-        src/ioc_query.c
+        src/ioc.c
+        src/ioc_sockios.c
+        src/ioc_if.c
 )
 
-target_include_directories(iocq
+target_include_directories(ioc
     PUBLIC
         include
 )
@@ -30,12 +32,12 @@ target_include_directories(test
 )
 
 target_link_libraries( test
-    iocq
+    ioc
 )
 
 ############################################################
 # Install
 ############################################################
 
-install (TARGETS iocq
+install (TARGETS ioc
     LIBRARY DESTINATION lib)

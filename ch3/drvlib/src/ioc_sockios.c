@@ -1,10 +1,8 @@
-#include <stdio.h>
+// #include <stdio.h>
 #include <linux/sockios.h>
-#include <string.h>
-#include "ioc_query.h"
+#include "ioc.h"
 
-
-static struct ioc_map sockios_maps[] = {
+static struct ioc_map macro_maps[] = {
     { "SIOCADDRT",              SIOCADDRT              },
     { "SIOCDELRT",              SIOCDELRT              },
     { "SIOCRTMSG",              SIOCRTMSG              },
@@ -80,19 +78,12 @@ static struct ioc_map sockios_maps[] = {
     { "SIOCGHWTSTAMP",          SIOCGHWTSTAMP          },
     { "SIOCDEVPRIVATE",         SIOCDEVPRIVATE         },
     { "SIOCPROTOPRIVATE",       SIOCPROTOPRIVATE       },
-    { NULL,                     (int)NULL              }
+    { NULL,                     0                      }
 };
 
 
 int
-ioc_query_sockios (char *sioc_name)
+ioc_macro_value_sockios (char *macro_name)
 {
-    struct ioc_map *map = sockios_maps;
-    while ((map != NULL) && (map->name != NULL)) {
-        if (0 == strncmp(sioc_name, map->name, strlen(map->name))) {
-            return map->code;
-        }
-        map++;
-    }
-    return -1;
+    return query_map(macro_maps, macro_name);
 }
