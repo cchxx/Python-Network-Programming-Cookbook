@@ -82,5 +82,6 @@ main (int argc, char *argv[])
     printf("SIOCDEVPRIVATE 0x%x == 0x%x\n", ioc_macro_value("sockios", "SIOCDEVPRIVATE"), 0x89F0);
     printf("SIOCPROTOPRIVATE 0x%x == 0x%x\n", ioc_macro_value("sockios", "SIOCPROTOPRIVATE"), 0x89E0);
 
-    printf("sizeof(ifreq) %d == %d\n", ioc_struct_size("if", "ifreq"), sizeof(struct ifreq));
+    printf("sizeof(ifreq) %d == %ld\n", ioc_struct_size("if", "ifreq"), sizeof(struct ifreq));
+    printf("IFNAMSIZ %d == %d\n", ioc_macro_value("if", "IFNAMSIZ"), IFNAMSIZ);
 }

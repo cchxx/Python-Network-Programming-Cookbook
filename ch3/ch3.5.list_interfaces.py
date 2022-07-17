@@ -27,7 +27,7 @@ STRUCT_SIZE_IFREQ = drvlib.ioc_struct_size(
     ctypes.c_char_p(
         'ifreq'.encode('utf-8')))
 
-IFNAMSIZ = drvlib.ioc_struct_size(
+IFNAMSIZ = drvlib.ioc_macro_value(
     ctypes.c_char_p(
         'if'.encode('utf-8')),
     ctypes.c_char_p(
@@ -44,6 +44,10 @@ def list_interfaces():
     max_interfaces = DEFAULT_INTERFACES
     is_64bits = sys.maxsize > PLATFORM_32_MAX_NUMBER
     struct_size = STRUCT_SIZE_64 if is_64bits else STRUCT_SIZE_32
+    #
+    # both SOCK_DGRAM and SOCK_STREAM can work
+    #
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         bytes = max_interfaces * struct_size

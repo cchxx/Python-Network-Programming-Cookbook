@@ -3,6 +3,15 @@
 
 #include <string.h>
 
+
+#define DBG(_fmt,...) \
+    do { \
+        extern int debug_flag; \
+        if (debug_flag) { \
+            printf(_fmt, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
 struct ioc_map {
     char * name;
     int value;
@@ -13,6 +22,7 @@ query_map (struct ioc_map *map, char *name)
 {
     while ((map != NULL) && (map->name != NULL)) {
         if (0 == strncmp(name, map->name, strlen(map->name))) {
+            DBG("\t\t%s ( %s ), hit\n", __func__, name);
             return map->value;
         }
         map++;
